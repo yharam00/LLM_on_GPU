@@ -21,9 +21,9 @@ from .benchmark_runner import BenchmarkExecutionResult
 
 # config 모듈 import (상대/절대 import 모두 지원)
 try:
-    from ..config.settings import RESULTS_DIRECTORY
+    from ..config.settings import RESULTS_DIRECTORY, DOCS_DIRECTORY
 except ImportError:
-    from config.settings import RESULTS_DIRECTORY
+    from config.settings import RESULTS_DIRECTORY, DOCS_DIRECTORY
 
 
 @dataclass
@@ -49,14 +49,20 @@ class ReportGenerator:
     다양한 형식의 리포트를 생성할 수 있습니다.
     """
     
-    def __init__(self, output_directory: Optional[Path] = None) -> None:
+    def __init__(
+        self,
+        output_directory: Optional[Path] = None,
+        docs_directory: Optional[Path] = None,
+    ) -> None:
         """
         ReportGenerator 인스턴스 초기화
         
         Args:
-            output_directory: 리포트 저장 디렉토리 (None이면 기본값 사용)
+            output_directory: 결과 JSON 저장 디렉토리 (None이면 기본값 사용)
+            docs_directory: 리포트 마크다운 저장 디렉토리 (None이면 기본값 사용)
         """
         self.output_directory = output_directory or RESULTS_DIRECTORY
+        self.docs_directory = docs_directory or DOCS_DIRECTORY
     
     def generate_kmle_report(
         self, results_data: Dict[str, Any]
@@ -108,7 +114,8 @@ class ReportGenerator:
         report_filename = (
             f"KMLE_2023_BENCHMARK_REPORT_{timestamp.strftime('%Y%m%d_%H%M%S')}.md"
         )
-        report_path = self.output_directory / report_filename
+        # 마크다운 리포트는 docs 디렉토리에 저장
+        report_path = self.docs_directory / report_filename
         
         with open(report_path, "w", encoding="utf-8") as file:
             file.write(report_content)

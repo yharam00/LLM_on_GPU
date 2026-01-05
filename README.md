@@ -23,10 +23,18 @@ refactored/
 │   └── report_generator.py # 리포트 생성
 ├── config/                  # 설정 관리
 │   └── settings.py          # 중앙화된 설정
-└── scripts/                 # 실행 가능한 스크립트
-    ├── run_kmle_benchmark.py
-    └── generate_kmle_report.py
+├── scripts/                 # 실행 가능한 스크립트
+│   ├── run_kmle_benchmark.py
+│   ├── run_custom_qa_benchmark.py
+│   └── generate_kmle_report.py
+├── benchmarks/              # 벤치마크 데이터 (기존 파일 심볼릭 링크)
+├── results/                 # 벤치마크 결과 JSON 파일
+├── logs/                    # 로그 파일
+├── docs/                    # 생성된 리포트 마크다운 파일
+└── models/                  # 다운로드된 모델 (선택사항)
 ```
+
+**참고**: `benchmarks/`, `results/`, `logs/`, `docs/` 디렉토리는 refactored 폴더 내부에서 자동으로 생성되며, 기존 상위 디렉토리의 파일들도 접근 가능합니다. refactored 내부에 파일이 있으면 우선 사용하고, 없으면 상위 디렉토리의 기존 파일을 사용합니다.
 
 ## 주요 개선사항
 

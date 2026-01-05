@@ -1,1 +1,44 @@
-*.pyc
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Results and logs (keep structure, ignore content)
+results/*.json
+results/*.txt
+results/*.log
+results/*.md
+results/*.png
+!results/.gitkeep
+
+logs/*.log
+logs/*.txt
+!logs/.gitkeep
+
+docs/*.md
+!docs/.gitkeep
+
+# Models (too large for git)
+models/
+!models/.gitkeep
+
+# Benchmarks (symlinks are fine, but ignore if copied)
+benchmarks/*.json
+benchmarks/*.jsonl
+!benchmarks/.gitkeep
