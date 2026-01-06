@@ -20,6 +20,7 @@ from transformers import (
 from typing import Optional, Tuple, Dict, Any
 from dataclasses import dataclass
 from pathlib import Path
+import os
 
 
 @dataclass(frozen=True)
@@ -73,6 +74,7 @@ class ModelLoader:
         quantization_config: Optional[QuantizationConfiguration] = None,
         dtype: torch.dtype = torch.bfloat16,
         trust_remote_code: bool = True,
+        token: Optional[str] = None,
     ) -> None:
         """
         ModelLoader 인스턴스 초기화
@@ -82,11 +84,14 @@ class ModelLoader:
             quantization_config: 양자화 설정 (None이면 양자화 미사용)
             dtype: 모델의 데이터 타입 (양자화 사용 시 무시됨)
             trust_remote_code: 원격 코드 실행 허용 여부
+            token: Hugging Face 토큰 (gated 모델 접근용, None이면 환경 변수 사용)
         """
         self.model_name: str = model_name
         self.quantization_config: Optional[QuantizationConfiguration] = quantization_config
         self.dtype: torch.dtype = dtype
         self.trust_remote_code: bool = trust_remote_code
+        # 토큰 설정: 전달된 토큰 또는 환경 변수에서 가져오기
+        self.token: Optional[str] = token or os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
         self.tokenizer: Optional[AutoTokenizer] = None
         self.model: Optional[AutoModelForCausalLM] = None
         self.device_map: Dict[str, int] = {}
@@ -106,6 +111,7 @@ class ModelLoader:
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.model_name,
             trust_remote_code=self.trust_remote_code,
+            token=self.token,
         )
         
         # pad_token이 없으면 eos_token으로 설정
@@ -133,6 +139,7 @@ class ModelLoader:
         try:
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
+                token=self.token,
                 **model_kwargs,
             )
         except Exception as error:
