@@ -1,6 +1,6 @@
-# LLM 벤치마크 시스템 (리팩토링 버전)
+# LLM 벤치마크 시스템
 
-이 디렉토리는 기존 `scripts` 폴더의 코드를 리팩토링한 버전입니다.
+이 프로젝트는 LLM(Large Language Model)의 성능을 벤치마크하는 시스템입니다.
 
 ## 리팩토링 원칙
 
@@ -13,28 +13,32 @@
 ## 디렉토리 구조
 
 ```
-refactored/
+LLM_on_GPU/
 ├── core/                    # 핵심 기능 모듈
+│   ├── __init__.py
 │   ├── model_loader.py      # 모델 로딩 및 관리
 │   ├── gpu_monitor.py       # GPU 모니터링
 │   ├── data_loader.py       # 벤치마크 데이터 로딩
-│   ├── answer_evaluator.py # 답변 평가
-│   ├── benchmark_runner.py # 벤치마크 실행
-│   └── report_generator.py # 리포트 생성
+│   ├── answer_evaluator.py  # 답변 평가
+│   ├── benchmark_runner.py  # 벤치마크 실행
+│   └── report_generator.py  # 리포트 생성
 ├── config/                  # 설정 관리
+│   ├── __init__.py
 │   └── settings.py          # 중앙화된 설정
 ├── scripts/                 # 실행 가능한 스크립트
-│   ├── run_kmle_benchmark.py
-│   ├── run_custom_qa_benchmark.py
-│   └── generate_kmle_report.py
-├── benchmarks/              # 벤치마크 데이터 (기존 파일 심볼릭 링크)
+│   ├── __init__.py
+│   ├── run_kmle_benchmark.py           # KMLE 2023 벤치마크 실행
+│   ├── run_custom_qa_benchmark.py      # 커스텀 QA 벤치마크 실행
+│   ├── run_single_model_benchmark.py   # 단일 모델 벤치마크 실행
+│   └── generate_kmle_report.py         # KMLE 리포트 생성
+├── benchmarks/              # 벤치마크 데이터
 ├── results/                 # 벤치마크 결과 JSON 파일
 ├── logs/                    # 로그 파일
 ├── docs/                    # 생성된 리포트 마크다운 파일
 └── models/                  # 다운로드된 모델 (선택사항)
 ```
 
-**참고**: `benchmarks/`, `results/`, `logs/`, `docs/` 디렉토리는 refactored 폴더 내부에서 자동으로 생성되며, 기존 상위 디렉토리의 파일들도 접근 가능합니다. refactored 내부에 파일이 있으면 우선 사용하고, 없으면 상위 디렉토리의 기존 파일을 사용합니다.
+**참고**: `benchmarks/`, `results/`, `logs/`, `docs/` 디렉토리는 자동으로 생성되며, 프로젝트 내부에 파일이 있으면 우선 사용하고, 없으면 상위 디렉토리의 기존 파일을 사용합니다.
 
 ## 주요 개선사항
 
@@ -64,11 +68,41 @@ refactored/
 
 ## 사용법
 
-### KMLE 벤치마크 실행
+### 단일 모델 벤치마크 실행 (권장)
+
+가장 유연한 방법으로, 커맨드라인에서 모델을 지정하여 벤치마크를 실행할 수 있습니다.
 
 ```bash
-cd /home/ychanmo/llm_testing/refactored
+# 기본 사용 (양자화 없이)
+python scripts/run_single_model_benchmark.py --model-name openai/gpt-oss-20b
+
+# 4-bit 양자화 사용
+python scripts/run_single_model_benchmark.py --model-name openai/gpt-oss-20b --use-quantization
+
+# 커스텀 QA 벤치마크 사용
+python scripts/run_single_model_benchmark.py --model-name openai/gpt-oss-20b --benchmark-type custom_qa
+
+# Gated 모델 사용 (토큰 필요)
+python scripts/run_single_model_benchmark.py --model-name google/medgemma-27b-text-it --use-quantization --token YOUR_HF_TOKEN
+# 또는 환경 변수 사용: export HF_TOKEN=YOUR_HF_TOKEN
+```
+
+### KMLE 벤치마크 실행
+
+여러 모델을 한 번에 실행하는 스크립트입니다.
+
+```bash
 python scripts/run_kmle_benchmark.py
+```
+
+### 커스텀 QA 벤치마크 실행
+
+```bash
+# 기본 모델 사용
+python scripts/run_custom_qa_benchmark.py
+
+# 특정 모델 지정
+python scripts/run_custom_qa_benchmark.py --model_name openai/gpt-oss-20b --use_quantization
 ```
 
 ### 리포트 생성
