@@ -1,0 +1,11 @@
+# Core dependencies
+torch>=2.0.0
+transformers>=4.30.0
+
+# Quantization support (required for 4-bit quantization)
+bitsandbytes>=0.41.0
+
+# Optional but recommended for better performance
+accelerate>=0.20.0
+
+# Note: All other imports (json, pathlib, datetime, typing, etc.) are Python standard library

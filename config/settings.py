@@ -6,6 +6,7 @@ LLM 벤치마크 시스템의 중앙화된 설정 관리 모듈
 
 이 모듈은 refactored 폴더 내부에서 실행될 때를 우선 고려하며,
 필요한 경우 상위 디렉토리의 기존 파일들도 접근할 수 있습니다.
+모델은 항상 프로젝트 내부(LLM_on_GPU/models/)에 저장되어 프로젝트 독립성을 유지합니다.
 
 Attributes:
     REFACTORED_DIRECTORY: refactored 폴더의 경로
@@ -62,9 +63,8 @@ BENCHMARKS_DIRECTORY: Path = _get_directory(
 RESULTS_DIRECTORY: Path = _get_directory(
     REFACTORED_RESULTS_DIRECTORY, LEGACY_RESULTS_DIRECTORY
 )
-MODELS_DIRECTORY: Path = _get_directory(
-    REFACTORED_MODELS_DIRECTORY, LEGACY_MODELS_DIRECTORY
-)
+# 모델은 항상 프로젝트 내부에 저장 (프로젝트 독립성 유지)
+MODELS_DIRECTORY: Path = REFACTORED_MODELS_DIRECTORY
 LOGS_DIRECTORY: Path = REFACTORED_LOGS_DIRECTORY
 DOCS_DIRECTORY: Path = REFACTORED_DOCS_DIRECTORY
 
@@ -101,4 +101,5 @@ LOGS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 DOCS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 REFACTORED_BENCHMARKS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 REFACTORED_RESULTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
+REFACTORED_MODELS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
