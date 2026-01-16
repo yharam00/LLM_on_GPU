@@ -33,6 +33,7 @@ from core import (
 from config.settings import (
     DEFAULT_BENCHMARK_PATHS,
     RESULTS_DIRECTORY,
+    MODELS_DIRECTORY,
 )
 
 
@@ -60,6 +61,7 @@ def load_and_run_tinyllama_benchmark(
             model_name=model_name,
             quantization_config=None,
             dtype=torch.bfloat16,
+            cache_dir=MODELS_DIRECTORY,
         )
         tokenizer, model = model_loader.load()
         
@@ -120,6 +122,7 @@ def load_and_run_deepseek_benchmark(
             quantization_config=quantization_config,
             dtype=torch.bfloat16,
             trust_remote_code=True,
+            cache_dir=MODELS_DIRECTORY,
         )
         tokenizer, model = model_loader.load()
         

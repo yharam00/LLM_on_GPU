@@ -75,6 +75,7 @@ class ModelLoader:
         dtype: torch.dtype = torch.bfloat16,
         trust_remote_code: bool = True,
         token: Optional[str] = None,
+        cache_dir: Optional[Path] = None,
     ) -> None:
         """
         ModelLoader 인스턴스 초기화
@@ -85,6 +86,7 @@ class ModelLoader:
             dtype: 모델의 데이터 타입 (양자화 사용 시 무시됨)
             trust_remote_code: 원격 코드 실행 허용 여부
             token: Hugging Face 토큰 (gated 모델 접근용, None이면 환경 변수 사용)
+            cache_dir: 모델 캐시 디렉토리 (None이면 Hugging Face 기본 캐시 사용)
         """
         self.model_name: str = model_name
         self.quantization_config: Optional[QuantizationConfiguration] = quantization_config
@@ -92,6 +94,7 @@ class ModelLoader:
         self.trust_remote_code: bool = trust_remote_code
         # 토큰 설정: 전달된 토큰 또는 환경 변수에서 가져오기
         self.token: Optional[str] = token or os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
+        self.cache_dir: Optional[Path] = cache_dir
         self.tokenizer: Optional[AutoTokenizer] = None
         self.model: Optional[AutoModelForCausalLM] = None
         self.device_map: Dict[str, int] = {}
@@ -107,11 +110,21 @@ class ModelLoader:
         Raises:
             RuntimeError: 모델 로딩 실패 시
         """
+        # 모델 이름이 로컬 경로인지 확인
+        is_local_path = Path(self.model_name).exists()
+        
         # 토크나이저 로드
+        tokenizer_kwargs: Dict[str, Any] = {
+            "trust_remote_code": self.trust_remote_code,
+            "token": self.token,
+        }
+        # 로컬 경로가 아니고 cache_dir이 지정된 경우에만 cache_dir 사용
+        if not is_local_path and self.cache_dir is not None:
+            tokenizer_kwargs["cache_dir"] = str(self.cache_dir)
+        
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.model_name,
-            trust_remote_code=self.trust_remote_code,
-            token=self.token,
+            **tokenizer_kwargs,
         )
         
         # pad_token이 없으면 eos_token으로 설정
@@ -128,7 +141,12 @@ class ModelLoader:
             "device_map": "auto",
             "trust_remote_code": self.trust_remote_code,
             "low_cpu_mem_usage": True,
+            "token": self.token,
         }
+        
+        # 로컬 경로가 아니고 cache_dir이 지정된 경우에만 cache_dir 사용
+        if not is_local_path and self.cache_dir is not None:
+            model_kwargs["cache_dir"] = str(self.cache_dir)
         
         if quantization_config_object is not None:
             model_kwargs["quantization_config"] = quantization_config_object
@@ -139,7 +157,6 @@ class ModelLoader:
         try:
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                token=self.token,
                 **model_kwargs,
             )
         except Exception as error:

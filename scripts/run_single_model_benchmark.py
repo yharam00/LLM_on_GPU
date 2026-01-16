@@ -49,6 +49,7 @@ from core import (
 from config.settings import (
     DEFAULT_BENCHMARK_PATHS,
     RESULTS_DIRECTORY,
+    MODELS_DIRECTORY,
 )
 
 
@@ -172,6 +173,7 @@ def run_single_model_benchmark(
             dtype=torch.bfloat16,
             trust_remote_code=trust_remote_code,
             token=token,
+            cache_dir=MODELS_DIRECTORY,
         )
         tokenizer, model = model_loader.load()
         
