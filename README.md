@@ -132,3 +132,4 @@ python scripts/generate_kmle_report.py /path/to/results.json
 - mypy 타입 체크 (가능한 경우)
 - pylint 또는 flake8 검사 통과
 
+
